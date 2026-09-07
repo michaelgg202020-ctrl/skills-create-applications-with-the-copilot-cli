@@ -24,15 +24,45 @@ function division(a, b) {
   return a / b;
 }
 
+// Supports modulo: a % b.
+function modulo(a, b) {
+  if (b === 0) {
+    throw new Error("Cannot calculate modulo by zero.");
+  }
+
+  return a % b;
+}
+
+// Supports exponentiation: base raised to an exponent.
+function power(base, exponent) {
+  return base ** exponent;
+}
+
+// Supports square root for non-negative numbers.
+function squareRoot(n) {
+  if (n < 0) {
+    throw new Error("Cannot calculate the square root of a negative number.");
+  }
+
+  return Math.sqrt(n);
+}
+
 const operations = {
   addition,
   subtraction,
   multiplication,
   division,
+  modulo,
+  power,
+  squareRoot,
   "+": addition,
   "-": subtraction,
   "*": multiplication,
   "/": division,
+  "%": modulo,
+  "^": power,
+  sqrt: squareRoot,
+  squareroot: squareRoot,
 };
 
 function calculate(operation, firstOperand, secondOperand) {
@@ -40,7 +70,7 @@ function calculate(operation, firstOperand, secondOperand) {
 
   if (!selectedOperation) {
     throw new Error(
-      "Unsupported operation. Use addition, subtraction, multiplication, or division."
+      "Unsupported operation. Use addition, subtraction, multiplication, division, modulo, power, or square root."
     );
   }
 
@@ -58,16 +88,27 @@ function parseOperand(value, name) {
 }
 
 function runCli(args) {
-  if (args.length !== 3) {
+  if (args.length < 2 || args.length > 3) {
     throw new Error(
-      "Usage: node src/calculator.js <operation> <first number> <second number>"
+      "Usage: node src/calculator.js <operation> <first number> [second number]"
     );
   }
 
   const [operation, firstValue, secondValue] = args;
   const firstOperand = parseOperand(firstValue, "First operand");
-  const secondOperand = parseOperand(secondValue, "Second operand");
 
+  if (
+    operation.toLowerCase() === "sqrt" ||
+    operation.toLowerCase() === "squareroot"
+  ) {
+    return squareRoot(firstOperand);
+  }
+
+  if (secondValue === undefined) {
+    throw new Error("This operation requires a second number.");
+  }
+
+  const secondOperand = parseOperand(secondValue, "Second operand");
   return calculate(operation.toLowerCase(), firstOperand, secondOperand);
 }
 
@@ -85,5 +126,8 @@ module.exports = {
   subtraction,
   multiplication,
   division,
+  modulo,
+  power,
+  squareRoot,
   calculate,
 };
